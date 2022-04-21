@@ -35,6 +35,8 @@ endif
 ifeq "$(with_quicklz)" "yes"
 	recurse_targets += quicklz
 endif
+recurse_targets += ip4r
+
 $(call recurse,all install clean distclean, $(recurse_targets))
 
 all: gpcloud pxf mapreduce orafce

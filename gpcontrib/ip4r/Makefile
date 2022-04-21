@@ -1,3 +1,4 @@
+NO_PGXS := 1
 
 MODULE_big = ip4r
 
@@ -43,7 +44,8 @@ PG_CONFIG ?= pg_config
 PGXS = $(shell $(PG_CONFIG) --pgxs)
 include $(PGXS)
 else
-subdir = contrib/ip4r
+# TODO: contrib or gpcontrib?
+subdir = gpcontrib/ip4r
 top_builddir = ../..
 include $(top_builddir)/src/Makefile.global
 include $(top_srcdir)/contrib/contrib-global.mk
