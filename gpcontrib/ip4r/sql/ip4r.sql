@@ -2168,6 +2168,7 @@ select * from ipaddrs a join ipranges r on (r.r6 >>= a.a6) order by a6,r6;
 -- index-only, on versions that support it:
 
 vacuum ipranges;
+analyze ipranges;
 
 select r from ipranges where r >>= '5555::' order by r;
 select r6 from ipranges where r6 >>= '5555::' order by r6;
