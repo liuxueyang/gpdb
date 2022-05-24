@@ -9,7 +9,6 @@
 *.dll
 *.a
 *.mo
-*.bc
 objfiles.txt
 .deps/
 *.gcno
