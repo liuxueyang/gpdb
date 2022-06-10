@@ -165,6 +165,10 @@ pgstattuple -
 	space within a table
 	by Tatsuo Ishii <ishii@sraoss.co.jp>
 
+postgres-hll -
+	This Postgres module introduces a new data type hll which is a HyperLogLog data structure.
+	by Ken Sedgwick <ken@bonsai.com>, Timon Karnezos <timon.karnezos@gmail.com>, and Rob Grzywinski <rgrzywinski@yahoo.com>
+
 seg -
 	Confidence-interval datatype (GiST indexing example)
 	by Gene Selkov, Jr. <selkovjr@mcs.anl.gov>

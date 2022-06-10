@@ -22,10 +22,21 @@ OBJS = $(patsubst %.c,%.o,$(wildcard src/*.c)) $(patsubst %.cpp,%.o,$(wildcard s
 PG_CPPFLAGS = -fPIC -Wall -Wextra -Werror -Wno-unused-parameter -Wno-implicit-fallthrough -Iinclude -I$(libpq_srcdir)
 
 REGRESS = setup $(filter-out setup,$(patsubst sql/%.sql,%,$(sort $(wildcard sql/*.sql))))
+REGRESS_OPTS += --init-file=$(top_srcdir)/src/test/regress/init_file
 
-PG_CONFIG ?= pg_config
-PGXS = $(shell $(PG_CONFIG) --pgxs)
+SHLIB_LINK	+= -lstdc++
+
+ifdef USE_PGXS
+PG_CONFIG = pg_config
+PGXS := $(shell $(PG_CONFIG) --pgxs)
 include $(PGXS)
+else
+subdir = contrib/postgresql-hll
+top_builddir = ../..
+include $(top_builddir)/src/Makefile.global
+include $(top_srcdir)/contrib/contrib-global.mk
+PG_CONFIG = pg_config
+endif
 
 SHLIB_LINK	+= -lstdc++
 SQLPP ?= cpp -undef -w -P -imacros $(shell $(PG_CONFIG) --includedir-server)/pg_config.h
