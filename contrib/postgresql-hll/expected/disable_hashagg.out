@@ -28,7 +28,7 @@ SELECT hll_set_output_version(1);
                       1
 (1 row)
 
-CREATE TABLE tt1(id int, col_1 int, sd hll) DISTRIBUTED BY (id);
+CREATE TABLE tt1(id int, col_1 int, sd hll) DISTRIBUTED RANDOMLY;
 INSERT INTO tt1 values(1,1, hll_empty());
 INSERT INTO tt1 values(1,2, hll_empty());
 UPDATE tt1 SET sd = hll_add(sd, hll_hash_integer(111)) WHERE id = 1 and col_1 = 1;
@@ -45,14 +45,18 @@ SELECT
 FROM 
 	tt1 
 GROUP BY(id);
-                QUERY PLAN                
-------------------------------------------
+                         QUERY PLAN                         
+------------------------------------------------------------
  Gather Motion 3:1  (slice1; segments: 3)
-   ->  HashAggregate
+   ->  Finalize HashAggregate
          Group Key: id
-         ->  Seq Scan on tt1
+         ->  Redistribute Motion 3:3  (slice2; segments: 3)
+               Hash Key: id
+               ->  Partial HashAggregate
+                     Group Key: id
+                     ->  Seq Scan on tt1
  Optimizer: Postgres query optimizer
-(5 rows)
+(9 rows)
 
 SET hll.force_groupagg to ON;
 EXPLAIN(COSTS OFF)
@@ -61,16 +65,19 @@ SELECT
 FROM 
 	tt1 
 GROUP BY(id);
-                QUERY PLAN                
-------------------------------------------
- Gather Motion 3:1  (slice1; segments: 3)
-   ->  GroupAggregate
-         Group Key: id
+                   QUERY PLAN                   
+------------------------------------------------
+ Finalize GroupAggregate
+   Group Key: id
+   ->  Gather Motion 3:1  (slice1; segments: 3)
+         Merge Key: id
          ->  Sort
                Sort Key: id
-               ->  Seq Scan on tt1
+               ->  Partial HashAggregate
+                     Group Key: id
+                     ->  Seq Scan on tt1
  Optimizer: Postgres query optimizer
-(7 rows)
+(10 rows)
 
 -- Test with operator over aggregate
 SET hll.force_groupagg to OFF;
@@ -80,14 +87,18 @@ SELECT
 FROM 
 	tt1 
 GROUP BY(id);
-                QUERY PLAN                
-------------------------------------------
+                         QUERY PLAN                         
+------------------------------------------------------------
  Gather Motion 3:1  (slice1; segments: 3)
-   ->  HashAggregate
+   ->  Finalize HashAggregate
          Group Key: id
-         ->  Seq Scan on tt1
+         ->  Redistribute Motion 3:3  (slice2; segments: 3)
+               Hash Key: id
+               ->  Partial HashAggregate
+                     Group Key: id
+                     ->  Seq Scan on tt1
  Optimizer: Postgres query optimizer
-(5 rows)
+(9 rows)
 
 SET hll.force_groupagg to ON;
 EXPLAIN(COSTS OFF)
@@ -96,16 +107,20 @@ SELECT
 FROM 
 	tt1 
 GROUP BY(id);
-                QUERY PLAN                
-------------------------------------------
+                            QUERY PLAN                            
+------------------------------------------------------------------
  Gather Motion 3:1  (slice1; segments: 3)
-   ->  GroupAggregate
+   ->  Finalize GroupAggregate
          Group Key: id
          ->  Sort
                Sort Key: id
-               ->  Seq Scan on tt1
+               ->  Redistribute Motion 3:3  (slice2; segments: 3)
+                     Hash Key: id
+                     ->  Partial HashAggregate
+                           Group Key: id
+                           ->  Seq Scan on tt1
  Optimizer: Postgres query optimizer
-(7 rows)
+(11 rows)
 
 -- Test with function over aggregate
 SET hll.force_groupagg to OFF;
@@ -115,14 +130,18 @@ SELECT
 FROM 
 	tt1 
 GROUP BY(id);
-                QUERY PLAN                
-------------------------------------------
+                         QUERY PLAN                         
+------------------------------------------------------------
  Gather Motion 3:1  (slice1; segments: 3)
-   ->  HashAggregate
+   ->  Finalize HashAggregate
          Group Key: id
-         ->  Seq Scan on tt1
+         ->  Redistribute Motion 3:3  (slice2; segments: 3)
+               Hash Key: id
+               ->  Partial HashAggregate
+                     Group Key: id
+                     ->  Seq Scan on tt1
  Optimizer: Postgres query optimizer
-(5 rows)
+(9 rows)
 
 SET hll.force_groupagg to ON;
 EXPLAIN(COSTS OFF)
@@ -131,16 +150,19 @@ SELECT
 FROM 
 	tt1 
 GROUP BY(id);
-                QUERY PLAN                
-------------------------------------------
- Gather Motion 3:1  (slice1; segments: 3)
-   ->  GroupAggregate
-         Group Key: id
+                   QUERY PLAN                   
+------------------------------------------------
+ Finalize GroupAggregate
+   Group Key: id
+   ->  Gather Motion 3:1  (slice1; segments: 3)
+         Merge Key: id
          ->  Sort
                Sort Key: id
-               ->  Seq Scan on tt1
+               ->  Partial HashAggregate
+                     Group Key: id
+                     ->  Seq Scan on tt1
  Optimizer: Postgres query optimizer
-(7 rows)
+(10 rows)
 
 -- Test with having clause
 SET hll.force_groupagg to OFF;
@@ -154,12 +176,16 @@ HAVING hll_cardinality(hll_union_agg(sd)) > 1;
                                   QUERY PLAN                                  
 ------------------------------------------------------------------------------
  Gather Motion 3:1  (slice1; segments: 3)
-   ->  HashAggregate
+   ->  Finalize HashAggregate
          Group Key: id
          Filter: (hll_cardinality(hll_union_agg(sd)) > '1'::double precision)
-         ->  Seq Scan on tt1
+         ->  Redistribute Motion 3:3  (slice2; segments: 3)
+               Hash Key: id
+               ->  Partial HashAggregate
+                     Group Key: id
+                     ->  Seq Scan on tt1
  Optimizer: Postgres query optimizer
-(6 rows)
+(10 rows)
 
 SET hll.force_groupagg to ON;
 EXPLAIN(COSTS OFF)
@@ -172,19 +198,23 @@ HAVING hll_cardinality(hll_union_agg(sd)) > 1;
                                   QUERY PLAN                                  
 ------------------------------------------------------------------------------
  Gather Motion 3:1  (slice1; segments: 3)
-   ->  GroupAggregate
+   ->  Finalize GroupAggregate
          Group Key: id
          Filter: (hll_cardinality(hll_union_agg(sd)) > '1'::double precision)
          ->  Sort
                Sort Key: id
-               ->  Seq Scan on tt1
+               ->  Redistribute Motion 3:3  (slice2; segments: 3)
+                     Hash Key: id
+                     ->  Partial HashAggregate
+                           Group Key: id
+                           ->  Seq Scan on tt1
  Optimizer: Postgres query optimizer
-(8 rows)
+(12 rows)
 
 -- Test hll_add_agg, first set statement_mem to 256MB in order to use hash aggregate
 -- before forcing group aggregate
 SET statement_mem TO '256MB';
-CREATE TABLE add_test_table(c1 bigint, c2 bigint) DISTRIBUTED BY (c1);
+CREATE TABLE add_test_table(c1 bigint, c2 bigint) DISTRIBUTED RANDOMLY;
 INSERT INTO add_test_table SELECT g, g FROM generate_series(1, 1000) AS g;
 -- Test with different hll_add_agg signatures
 SET hll.force_groupagg TO OFF;
@@ -194,14 +224,18 @@ SELECT
 FROM 
 	add_test_table 
 GROUP BY 1;
-                QUERY PLAN                
-------------------------------------------
+                         QUERY PLAN                         
+------------------------------------------------------------
  Gather Motion 3:1  (slice1; segments: 3)
-   ->  HashAggregate
+   ->  Finalize HashAggregate
          Group Key: c1
-         ->  Seq Scan on add_test_table
+         ->  Redistribute Motion 3:3  (slice2; segments: 3)
+               Hash Key: c1
+               ->  Partial HashAggregate
+                     Group Key: c1
+                     ->  Seq Scan on add_test_table
  Optimizer: Postgres query optimizer
-(5 rows)
+(9 rows)
 
 SET hll.force_groupagg TO ON;
 EXPLAIN(COSTS OFF) 
@@ -210,16 +244,19 @@ SELECT
 FROM 
 	add_test_table 
 GROUP BY 1;
-                  QUERY PLAN                  
-----------------------------------------------
- Gather Motion 3:1  (slice1; segments: 3)
-   ->  GroupAggregate
-         Group Key: c1
+                     QUERY PLAN                     
+----------------------------------------------------
+ Finalize GroupAggregate
+   Group Key: c1
+   ->  Gather Motion 3:1  (slice1; segments: 3)
+         Merge Key: c1
          ->  Sort
                Sort Key: c1
-               ->  Seq Scan on add_test_table
+               ->  Partial HashAggregate
+                     Group Key: c1
+                     ->  Seq Scan on add_test_table
  Optimizer: Postgres query optimizer
-(7 rows)
+(10 rows)
 
 SET hll.force_groupagg TO OFF;
 EXPLAIN(COSTS OFF) 
@@ -228,14 +265,18 @@ SELECT
 FROM 
 	add_test_table 
 GROUP BY 1;
-                QUERY PLAN                
-------------------------------------------
+                         QUERY PLAN                         
+------------------------------------------------------------
  Gather Motion 3:1  (slice1; segments: 3)
-   ->  HashAggregate
+   ->  Finalize HashAggregate
          Group Key: c1
-         ->  Seq Scan on add_test_table
+         ->  Redistribute Motion 3:3  (slice2; segments: 3)
+               Hash Key: c1
+               ->  Partial HashAggregate
+                     Group Key: c1
+                     ->  Seq Scan on add_test_table
  Optimizer: Postgres query optimizer
-(5 rows)
+(9 rows)
 
 SET hll.force_groupagg TO ON;
 EXPLAIN(COSTS OFF) 
@@ -244,16 +285,19 @@ SELECT
 FROM 
 	add_test_table 
 GROUP BY 1;
-                  QUERY PLAN                  
-----------------------------------------------
- Gather Motion 3:1  (slice1; segments: 3)
-   ->  GroupAggregate
-         Group Key: c1
+                     QUERY PLAN                     
+----------------------------------------------------
+ Finalize GroupAggregate
+   Group Key: c1
+   ->  Gather Motion 3:1  (slice1; segments: 3)
+         Merge Key: c1
          ->  Sort
                Sort Key: c1
-               ->  Seq Scan on add_test_table
+               ->  Partial HashAggregate
+                     Group Key: c1
+                     ->  Seq Scan on add_test_table
  Optimizer: Postgres query optimizer
-(7 rows)
+(10 rows)
 
 SET hll.force_groupagg TO OFF;
 EXPLAIN(COSTS OFF) 
@@ -262,14 +306,18 @@ SELECT
 FROM 
 	add_test_table 
 GROUP BY 1;
-                QUERY PLAN                
-------------------------------------------
+                         QUERY PLAN                         
+------------------------------------------------------------
  Gather Motion 3:1  (slice1; segments: 3)
-   ->  HashAggregate
+   ->  Finalize HashAggregate
          Group Key: c1
-         ->  Seq Scan on add_test_table
+         ->  Redistribute Motion 3:3  (slice2; segments: 3)
+               Hash Key: c1
+               ->  Partial HashAggregate
+                     Group Key: c1
+                     ->  Seq Scan on add_test_table
  Optimizer: Postgres query optimizer
-(5 rows)
+(9 rows)
 
 SET hll.force_groupagg TO ON;
 EXPLAIN(COSTS OFF) 
@@ -278,16 +326,19 @@ SELECT
 FROM 
 	add_test_table 
 GROUP BY 1;
-                  QUERY PLAN                  
-----------------------------------------------
- Gather Motion 3:1  (slice1; segments: 3)
-   ->  GroupAggregate
-         Group Key: c1
+                     QUERY PLAN                     
+----------------------------------------------------
+ Finalize GroupAggregate
+   Group Key: c1
+   ->  Gather Motion 3:1  (slice1; segments: 3)
+         Merge Key: c1
          ->  Sort
                Sort Key: c1
-               ->  Seq Scan on add_test_table
+               ->  Partial HashAggregate
+                     Group Key: c1
+                     ->  Seq Scan on add_test_table
  Optimizer: Postgres query optimizer
-(7 rows)
+(10 rows)
 
 SET hll.force_groupagg TO OFF;
 EXPLAIN(COSTS OFF) 
@@ -296,14 +347,18 @@ SELECT
 FROM 
 	add_test_table 
 GROUP BY 1;
-                QUERY PLAN                
-------------------------------------------
+                         QUERY PLAN                         
+------------------------------------------------------------
  Gather Motion 3:1  (slice1; segments: 3)
-   ->  HashAggregate
+   ->  Finalize HashAggregate
          Group Key: c1
-         ->  Seq Scan on add_test_table
+         ->  Redistribute Motion 3:3  (slice2; segments: 3)
+               Hash Key: c1
+               ->  Partial HashAggregate
+                     Group Key: c1
+                     ->  Seq Scan on add_test_table
  Optimizer: Postgres query optimizer
-(5 rows)
+(9 rows)
 
 SET hll.force_groupagg TO ON;
 EXPLAIN(COSTS OFF) 
@@ -312,16 +367,19 @@ SELECT
 FROM 
 	add_test_table 
 GROUP BY 1;
-                  QUERY PLAN                  
-----------------------------------------------
- Gather Motion 3:1  (slice1; segments: 3)
-   ->  GroupAggregate
-         Group Key: c1
+                     QUERY PLAN                     
+----------------------------------------------------
+ Finalize GroupAggregate
+   Group Key: c1
+   ->  Gather Motion 3:1  (slice1; segments: 3)
+         Merge Key: c1
          ->  Sort
                Sort Key: c1
-               ->  Seq Scan on add_test_table
+               ->  Partial HashAggregate
+                     Group Key: c1
+                     ->  Seq Scan on add_test_table
  Optimizer: Postgres query optimizer
-(7 rows)
+(10 rows)
 
 SET hll.force_groupagg TO OFF;
 EXPLAIN(COSTS OFF) 
@@ -330,14 +388,18 @@ SELECT
 FROM 
 	add_test_table 
 GROUP BY 1;
-                QUERY PLAN                
-------------------------------------------
+                         QUERY PLAN                         
+------------------------------------------------------------
  Gather Motion 3:1  (slice1; segments: 3)
-   ->  HashAggregate
+   ->  Finalize HashAggregate
          Group Key: c1
-         ->  Seq Scan on add_test_table
+         ->  Redistribute Motion 3:3  (slice2; segments: 3)
+               Hash Key: c1
+               ->  Partial HashAggregate
+                     Group Key: c1
+                     ->  Seq Scan on add_test_table
  Optimizer: Postgres query optimizer
-(5 rows)
+(9 rows)
 
 SET hll.force_groupagg TO ON;
 EXPLAIN(COSTS OFF) 
@@ -346,16 +408,19 @@ SELECT
 FROM 
 	add_test_table 
 GROUP BY 1;
-                  QUERY PLAN                  
-----------------------------------------------
- Gather Motion 3:1  (slice1; segments: 3)
-   ->  GroupAggregate
-         Group Key: c1
+                     QUERY PLAN                     
+----------------------------------------------------
+ Finalize GroupAggregate
+   Group Key: c1
+   ->  Gather Motion 3:1  (slice1; segments: 3)
+         Merge Key: c1
          ->  Sort
                Sort Key: c1
-               ->  Seq Scan on add_test_table
+               ->  Partial HashAggregate
+                     Group Key: c1
+                     ->  Seq Scan on add_test_table
  Optimizer: Postgres query optimizer
-(7 rows)
+(10 rows)
 
 DROP TABLE tt1;
 DROP TABLE add_test_table;
