@@ -7,9 +7,7 @@ SELECT hll_set_output_version(1);
 -- This test relies on a non-standard fixed sparse-to-compressed
 -- threshold value.
 --
--- start_ignore
-SELECT hll_set_max_sparse(512) from gp_dist_random('gp_id');
--- end_ignore
+SELECT hll_set_max_sparse(512);
 
 DROP TABLE IF EXISTS test_eopzdzwz;
 
