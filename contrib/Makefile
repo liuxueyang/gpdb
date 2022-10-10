@@ -50,7 +50,6 @@ SUBDIRS = \
 		tsm_system_rows \
 		tsm_system_time \
 		unaccent	\
-		uuid-ossp	\
 		vacuumlo
 
 # Greenplum-specific additions (to ease merge pain).
