@@ -25,9 +25,11 @@ all:
 	$(MAKE) -C contrib/pgcrypto all
 	$(MAKE) -C contrib/btree_gin all
 	$(MAKE) -C contrib/pg_trgm all
-	$(MAKE) -C contrib/uuid-ossp all
 ifeq ($(with_openssl), yes)
 	$(MAKE) -C contrib/sslinfo all
+endif
+ifneq ($(with_uuid),no)
+	$(MAKE) -C contrib/uuid-ossp all
 endif
 	$(MAKE) -C gpMgmt all
 	$(MAKE) -C gpcontrib all
@@ -61,9 +63,11 @@ install:
 	$(MAKE) -C contrib/pgcrypto $@
 	$(MAKE) -C contrib/btree_gin $@
 	$(MAKE) -C contrib/pg_trgm $@
-	$(MAKE) -C contrib/uuid-ossp $@
 ifeq ($(with_openssl), yes)
 	$(MAKE) -C contrib/sslinfo $@
+endif
+ifneq ($(with_uuid),no)
+	$(MAKE) -C contrib/uuid-ossp $@
 endif
 	$(MAKE) -C gpMgmt $@
 	$(MAKE) -C gpcontrib $@
