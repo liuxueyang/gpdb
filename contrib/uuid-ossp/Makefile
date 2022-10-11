@@ -8,6 +8,7 @@ DATA = uuid-ossp--1.1.sql uuid-ossp--1.0--1.1.sql uuid-ossp--unpackaged--1.0.sql
 PGFILEDESC = "uuid-ossp - UUID generation"
 
 REGRESS = uuid_ossp
+REGRESS_OPTS += --init-file=$(top_builddir)/src/test/regress/init_file
 
 SHLIB_LINK += $(UUID_LIBS)
 
