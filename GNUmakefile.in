@@ -162,6 +162,9 @@ ICW_TARGETS += contrib/indexscan contrib/hstore contrib/pgcrypto
 ifeq ($(with_openssl), yes)
 ICW_TARGETS += contrib/sslinfo
 endif
+ifneq ($(with_uuid),no)
+ICW_TARGETS += contrib/uuid-ossp
+endif
 ICW_TARGETS += gpcontrib src/bin gpMgmt/bin
 
 $(call recurse,installcheck-world, $(ICW_TARGETS),installcheck)
