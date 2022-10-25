@@ -73,3 +73,9 @@ SELECT uuid_version_bits(uuid_generate_v4()),
        uuid_reserved_bits(uuid_generate_v4());
 
 SELECT uuid_generate_v4() <> uuid_generate_v4();
+
+CREATE TABLE T(url TEXT) distributed BY (url);
+INSERT INTO T (SELECT 'www.widgets' || num::TEXT || '.com' FROM generate_series(1, 10) AS num);
+INSERT INTO T (SELECT 'www.widgets' || num::TEXT || '.com' FROM generate_series(1, 10) AS num);
+SELECT uuid_generate_v3(uuid_ns_dns(), t.url) FROM T;
+SELECT uuid_generate_v5(uuid_ns_dns(), t.url) FROM T;

@@ -137,3 +137,56 @@ SELECT uuid_generate_v4() <> uuid_generate_v4();
  t
 (1 row)
 
+CREATE TABLE T(url TEXT) distributed BY (url);
+INSERT INTO T (SELECT 'www.widgets' || num::TEXT || '.com' FROM generate_series(1, 10) AS num);
+INSERT INTO T (SELECT 'www.widgets' || num::TEXT || '.com' FROM generate_series(1, 10) AS num);
+SELECT uuid_generate_v3(uuid_ns_dns(), t.url) FROM T;
+           uuid_generate_v3           
+--------------------------------------
+ 98354fe6-e587-3d94-a8f4-34ed26bef8d7
+ b26c743e-c7d6-318d-85d7-5d62e9893cbb
+ 98354fe6-e587-3d94-a8f4-34ed26bef8d7
+ b26c743e-c7d6-318d-85d7-5d62e9893cbb
+ 29be2215-60f6-38df-b2ee-c3c666c231b7
+ b43e916b-8ab4-3d92-a48b-8906bdf91a7b
+ 5628945f-7850-3bcf-975e-b0ef14d7be1e
+ 6c9f8438-44b5-3d45-92b7-3cbb666c7d93
+ 536bbf6b-48de-30f6-94f0-9385f227066c
+ 8f866393-0655-3843-8626-7fb2e20cb759
+ 754a4fb2-8430-3f45-86a0-b62f77ddf609
+ 29be2215-60f6-38df-b2ee-c3c666c231b7
+ b43e916b-8ab4-3d92-a48b-8906bdf91a7b
+ 5628945f-7850-3bcf-975e-b0ef14d7be1e
+ 6c9f8438-44b5-3d45-92b7-3cbb666c7d93
+ 536bbf6b-48de-30f6-94f0-9385f227066c
+ 8f866393-0655-3843-8626-7fb2e20cb759
+ 754a4fb2-8430-3f45-86a0-b62f77ddf609
+ dc3c4a5d-ba34-3413-ac64-f33928e94e7b
+ dc3c4a5d-ba34-3413-ac64-f33928e94e7b
+(20 rows)
+
+SELECT uuid_generate_v5(uuid_ns_dns(), t.url) FROM T;
+           uuid_generate_v5           
+--------------------------------------
+ 3f3e7898-6d82-57c1-b2cb-329a7b5673eb
+ a770350d-869e-5362-af04-a9abb9aaf100
+ 2617bca3-41e4-572f-97bd-f8bcec10aeff
+ e0832682-f984-5420-9851-67f80731e6c9
+ f0e382c7-bcbe-5f13-93a7-9deef3e94208
+ ea7413df-d44d-5b6f-b89c-5c9afa7c771f
+ 04b98017-112a-5309-ae1a-564a7ef0fb16
+ 3f3e7898-6d82-57c1-b2cb-329a7b5673eb
+ a770350d-869e-5362-af04-a9abb9aaf100
+ 2617bca3-41e4-572f-97bd-f8bcec10aeff
+ e0832682-f984-5420-9851-67f80731e6c9
+ f0e382c7-bcbe-5f13-93a7-9deef3e94208
+ ea7413df-d44d-5b6f-b89c-5c9afa7c771f
+ 04b98017-112a-5309-ae1a-564a7ef0fb16
+ a50ae42f-b6d5-5a5b-a296-3cb649277111
+ 21db6ff5-da85-5acc-9276-2519f27e26b4
+ a50ae42f-b6d5-5a5b-a296-3cb649277111
+ 21db6ff5-da85-5acc-9276-2519f27e26b4
+ 8adf267e-dd06-54df-9d44-4bcee22f47e1
+ 8adf267e-dd06-54df-9d44-4bcee22f47e1
+(20 rows)
+
