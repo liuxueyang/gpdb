@@ -2604,6 +2604,17 @@ JumbleExpr(pgssJumbleState *jstate, Node *node)
 				JumbleExpr(jstate, (Node *) grpnode->refs);
 			}
 			break;
+		case T_GroupId:
+		case T_GroupingSetId:
+		case T_RowIdExpr:
+		case T_AggExprId:
+			/*
+			 * No need to jumble for gpdb's special op,  jstate->jumble
+			 * is only used to generate a queryId that can uniquely
+			 * identify a query, and it is fully capable of uniquely
+			 * identifying a query for the existing node type.
+			 */
+			break;
 		case T_WindowFunc:
 			{
 				WindowFunc *expr = (WindowFunc *) node;
