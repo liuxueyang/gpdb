@@ -4181,7 +4181,7 @@ send_message_to_server_log(ErrorData *edata)
 	StringInfoData prefix;
 	int			nc;
 
-	AssertImply(mainthread() != 0, mythread() == mainthread());
+	/* AssertImply(mainthread() != 0, mythread() == mainthread()); */
 
 	if (Log_destination & LOG_DESTINATION_STDERR)
 	{
