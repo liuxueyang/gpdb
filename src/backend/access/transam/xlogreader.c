@@ -1519,11 +1519,11 @@ zstd_decompress_backupblock(const char *source, int32 slen, char *dest,
 		static ZSTD_DCtx  *cxt = NULL;      /* ZSTD decompression context */
 		if (!cxt)
 		{
-			cxt = ZSTD_createDCtx();
-			if (!cxt)
-			{
-				snprintf(errormessage, MAX_ERRORMSG_LEN, "out of memory");
-				return false;
+		cxt = ZSTD_createDCtx_advanced(ZSTD_customMem_pg);
+		if (!cxt)
+		{
+			snprintf(errormessage, MAX_ERRORMSG_LEN, "out of memory");
+			return false;
 			}
 		}
 

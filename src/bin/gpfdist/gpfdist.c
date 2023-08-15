@@ -3904,7 +3904,7 @@ static int request_parse_gp_headers(request_t *r, int opt_g)
 		if (r->is_get)
 			r->zstd_cctx = ZSTD_createCStream();
 		else
-			r->zstd_dctx = ZSTD_createDCtx();
+			r->zstd_dctx = ZSTD_createDCtx_advanced(ZSTD_customMem_pg);
 	}
 	else
 	{
@@ -5111,7 +5111,7 @@ static int decompress_data(request_t* r, zstd_buffer *in, zstd_buffer *out)
 
 	if (!r->zstd_dctx) 
 	{
-		gwarning(NULL, "%s", "Out of memory when ZSTD_createDCtx");
+		gwarning(NULL, "%s", "Out of memory when ZSTD_createDCtx_advanced");
 		return -1;
 	}
 

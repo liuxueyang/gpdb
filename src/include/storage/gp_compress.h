@@ -55,7 +55,7 @@ extern void gp_decompress(
  *
  * zstd_context *ctx = call zstd_alloc_context();
  *
- * ctx->cctx = ZSTD_createCCtx();
+ * ctx->cctx = ZSTD_createCCtx_advanced(ZSTD_customMem_pg);
  * if (!ctx->cctx)
  *     elog(ERROR, "out of memory");
  *
@@ -79,6 +79,13 @@ typedef struct
 
 extern void zstd_free_context(zstd_context *context);
 extern zstd_context *zstd_alloc_context(void);
+extern void *zstd_custom_palloc(void *opaque, size_t size);
+extern void zstd_custom_pfree(void *opaque, void *address);
+ZSTD_customMem const ZSTD_customMem_pg = {
+	zstd_custom_palloc,
+	zstd_custom_pfree,
+	NULL,
+};
 
 #endif	/* USE_ZSTD */
 

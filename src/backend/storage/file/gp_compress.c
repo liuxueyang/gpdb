@@ -187,4 +187,17 @@ zstd_free_callback(ResourceReleasePhase phase,
 	}
 }
 
+void *
+zstd_custom_palloc(void *opaque, size_t size)
+{
+	(void)opaque;
+	return palloc(size);
+}
+
+void zstd_custom_pfree(void *opaque, void *address)
+{
+	(void)opaque;
+	pfree(address);
+}
+
 #endif	/* USE_ZSTD */

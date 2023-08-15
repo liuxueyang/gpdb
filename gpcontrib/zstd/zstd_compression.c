@@ -67,8 +67,8 @@ zstd_constructor(PG_FUNCTION_ARGS)
 	state->compress = compress;
 
 	state->ctx = zstd_alloc_context();
-	state->ctx->cctx = ZSTD_createCCtx();
-	state->ctx->dctx = ZSTD_createDCtx();
+	state->ctx->cctx = ZSTD_createCCtx_advanced(ZSTD_customMem_pg);
+	state->ctx->dctx = ZSTD_createDCtx_advanced(ZSTD_customMem_pg);
 
 	if (!state->ctx->cctx)
 		elog(ERROR, "out of memory");

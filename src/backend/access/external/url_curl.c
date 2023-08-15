@@ -424,15 +424,15 @@ header_callback(void *ptr_, size_t size, size_t nmemb, void *userp)
 			url->zstd = strtol(buf, 0, 0);
 
 			if (url->for_write && url->zstd)
-			{	
-				url->curl->zstd_cctx = ZSTD_createCCtx();
+			{
+				url->curl->zstd_cctx = ZSTD_createCCtx_advanced(ZSTD_customMem_pg);
 				/* allocate out.cptr whose size equals to out.ptr */
 				url->out.cptr = (char *) palloc(writable_external_table_bufsize * 1024);
 				url->lastsize = 0;
 			}
 			else if (url->zstd)
 			{
-				url->curl->zstd_dctx = ZSTD_createDCtx();
+				url->curl->zstd_dctx = ZSTD_createDCtx_advanced(ZSTD_customMem_pg);
 				url->lastsize = ZSTD_initDStream(url->curl->zstd_dctx);
 			}
 #endif

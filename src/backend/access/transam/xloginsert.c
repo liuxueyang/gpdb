@@ -850,7 +850,7 @@ XLogCompressBackupBlock(char *page, uint16 hole_offset, uint16 hole_length,
 
 	if (!cxt)
 	{
-		cxt = ZSTD_createCCtx();
+		cxt = ZSTD_createCCtx_advanced(ZSTD_customMem_pg);
 		if (!cxt)
 			elog(ERROR, "out of memory");
 	}

@@ -109,7 +109,7 @@ compress_string(const char *src, int uncompressed_size, int *size)
 
 	if (!cxt)
 	{
-		cxt = ZSTD_createCCtx();
+		cxt = ZSTD_createCCtx_advanced(ZSTD_customMem_pg);
 		if (!cxt)
 			elog(ERROR, "out of memory");
 	}
@@ -145,7 +145,7 @@ uncompress_string(const char *src, int size, int *uncompressed_size_p)
 
 	if (!cxt)
 	{
-		cxt = ZSTD_createDCtx();
+		cxt = ZSTD_createDCtx_advanced(ZSTD_customMem_pg);
 		if (!cxt)
 			elog(ERROR, "out of memory");
 	}
