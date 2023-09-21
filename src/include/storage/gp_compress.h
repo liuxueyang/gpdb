@@ -87,7 +87,7 @@ extern ZSTD_CCtx *ZSTD_createCCtx_gp(void);
 extern void *zstd_custom_palloc(void *opaque, size_t size);
 extern void zstd_custom_pfree(void *opaque, void *address);
 
-static ZSTD_customMem ZSTD_customMem_pg = {
+extern ZSTD_customMem ZSTD_customMem_pg = {
 	zstd_custom_palloc,
 	zstd_custom_pfree,
 	NULL,
