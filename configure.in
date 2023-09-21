@@ -1746,6 +1746,7 @@ fi
 if test "$with_static_zstd" = yes; then
   AC_CHECK_HEADER(zstd.h, [], [AC_MSG_ERROR([header file <zstd.h> is required for zstd support])])
   AC_CHECK_HEADER(zstd_errors.h, [], [AC_MSG_ERROR([header file <zstd_errors.h> is required for zstd support])])
+  AC_CHECK_FUNC(ZSTD_createCCtx_advanced, [], [AC_MSG_ERROR([ZSTD_createCCtx_advanced is required for static zstd support])])
 fi
 
 if test "$with_gssapi" = yes ; then

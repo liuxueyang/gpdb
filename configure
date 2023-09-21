@@ -15555,6 +15555,13 @@ else
 fi
 
 
+  ac_fn_c_check_func "$LINENO" "ZSTD_createCCtx_advanced" "ac_cv_func_ZSTD_createCCtx_advanced"
+if test "x$ac_cv_func_ZSTD_createCCtx_advanced" = xyes; then :
+
+else
+  as_fn_error $? "ZSTD_createCCtx_advanced is required for static zstd support" "$LINENO" 5
+fi
+
 fi
 
 if test "$with_gssapi" = yes ; then
