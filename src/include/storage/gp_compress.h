@@ -84,6 +84,7 @@ extern ZSTD_CCtx *ZSTD_createCCtx_gp(void);
 
 #ifdef USE_ZSTD_ADVANCED_FEATURE
 extern ZSTD_CCtx *ZSTD_createCCtx_gp(void);
+extern ZSTD_DCtx *ZSTD_createDCtx_gp(void);
 #endif /* USE_ZSTD_ADVANCED_FEATURE */
 
 #endif	/* USE_ZSTD */

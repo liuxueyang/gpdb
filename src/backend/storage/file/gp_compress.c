@@ -221,6 +221,23 @@ extern ZSTD_CCtx *ZSTD_createCCtx_gp(void)
 #endif /* USE_ZSTD_ADVANCED_FEATURE */
 }
 
+extern ZSTD_DCtx *ZSTD_createDCtx_gp(void)
+{
+#ifdef USE_ZSTD_ADVANCED_FEATURE
+
+#define ZSTD_STATIC_LINKING_ONLY
+	ZSTD_customMem ZSTD_customMem_pg;
+
+	ZSTD_customMem_pg.customAlloc = zstd_custom_palloc;
+	ZSTD_customMem_pg.customFree = zstd_custom_pfree;
+	ZSTD_customMem_pg.opaque = NULL;
+
+	return ZSTD_createDCtx_advanced(ZSTD_customMem_pg);
+#else
+	return ZSTD_createDCtx();
+#endif /* USE_ZSTD_ADVANCED_FEATURE */
+}
+
 #endif /* USE_ZSTD_ADVANCED_FEATURE */
 
 #endif	/* USE_ZSTD */
