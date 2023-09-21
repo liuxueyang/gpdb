@@ -204,13 +204,4 @@ void zstd_custom_pfree(void *opaque, void *address)
 
 #endif /* USE_ZSTD_ADVANCED_FEATURE */
 
-extern ZSTD_CCtx *ZSTD_createCCtx_gp(void)
-{
-#ifdef USE_ZSTD_ADVANCED_FEATURE
-	return ZSTD_createCCtx_advanced(ZSTD_customMem_pg);
-#else
-	return ZSTD_createCCtx();
-#endif /* USE_ZSTD_ADVANCED_FEATURE */
-}
-
 #endif	/* USE_ZSTD */

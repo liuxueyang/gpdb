@@ -44,6 +44,23 @@ typedef struct zstd_state
 	zstd_context *ctx;			/* ZSTD compression/decompresion contexts */
 } zstd_state;
 
+extern ZSTD_CCtx *ZSTD_createCCtx_gp(void)
+{
+#ifdef USE_ZSTD_ADVANCED_FEATURE
+	ZSTD_customMem ZSTD_customMem_pg;
+
+	ZSTD_customMem_pg = {
+		zstd_custom_palloc,
+		zstd_custom_pfree,
+		NULL,
+	};
+
+	return ZSTD_createCCtx_advanced(ZSTD_customMem_pg);
+#else
+	return ZSTD_createCCtx();
+#endif /* USE_ZSTD_ADVANCED_FEATURE */
+}
+
 Datum
 zstd_constructor(PG_FUNCTION_ARGS)
 {
