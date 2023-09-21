@@ -83,10 +83,7 @@ extern zstd_context *zstd_alloc_context(void);
 extern ZSTD_CCtx *ZSTD_createCCtx_gp(void);
 
 #ifdef USE_ZSTD_ADVANCED_FEATURE
-
-extern void *zstd_custom_palloc(void *opaque, size_t size);
-extern void zstd_custom_pfree(void *opaque, void *address);
-
+extern ZSTD_CCtx *ZSTD_createCCtx_gp(void);
 #endif /* USE_ZSTD_ADVANCED_FEATURE */
 
 #endif	/* USE_ZSTD */

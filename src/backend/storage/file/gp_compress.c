@@ -23,6 +23,7 @@
 #include "utils/resowner.h"
 
 #ifdef USE_ZSTD
+#define ZSTD_STATIC_LINKING_ONLY
 #include <zstd.h>
 #endif
 
@@ -189,17 +190,35 @@ zstd_free_callback(ResourceReleasePhase phase,
 
 #ifdef USE_ZSTD_ADVANCED_FEATURE
 
-void *
+static void *
 zstd_custom_palloc(void *opaque, size_t size)
 {
 	(void)opaque;
 	return palloc(size);
 }
 
-void zstd_custom_pfree(void *opaque, void *address)
+static void
+zstd_custom_pfree(void *opaque, void *address)
 {
 	(void)opaque;
 	pfree(address);
+}
+
+extern ZSTD_CCtx *ZSTD_createCCtx_gp(void)
+{
+#ifdef USE_ZSTD_ADVANCED_FEATURE
+
+#define ZSTD_STATIC_LINKING_ONLY
+	ZSTD_customMem ZSTD_customMem_pg;
+
+	ZSTD_customMem_pg.customAlloc = zstd_custom_palloc;
+	ZSTD_customMem_pg.customFree = zstd_custom_pfree;
+	ZSTD_customMem_pg.opaque = NULL;
+
+	return ZSTD_createCCtx_advanced(ZSTD_customMem_pg);
+#else
+	return ZSTD_createCCtx();
+#endif /* USE_ZSTD_ADVANCED_FEATURE */
 }
 
 #endif /* USE_ZSTD_ADVANCED_FEATURE */
