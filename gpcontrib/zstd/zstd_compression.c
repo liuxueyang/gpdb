@@ -67,7 +67,7 @@ zstd_constructor(PG_FUNCTION_ARGS)
 	state->compress = compress;
 
 	state->ctx = zstd_alloc_context();
-	state->ctx->cctx = ZSTD_createCCtx();
+	state->ctx->cctx = ZSTD_createCCtx_gp();
 	state->ctx->dctx = ZSTD_createDCtx();
 
 	if (!state->ctx->cctx)

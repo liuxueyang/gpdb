@@ -187,4 +187,25 @@ zstd_free_callback(ResourceReleasePhase phase,
 	}
 }
 
+#ifdef USE_ZSTD_ADVANCED_FEATURE
+
+void *
+zstd_custom_palloc(void *opaque, size_t size)
+{
+	(void)opaque;
+	return palloc(size);
+}
+
+void zstd_custom_pfree(void *opaque, void *address)
+{
+	(void)opaque;
+	pfree(address);
+}
+
+extern ZSTD_CCtx *ZSTD_createCCtx_gp(void)
+{
+	return ZSTD_createCCtx_advanced(ZSTD_customMem_pg);
+}
+#endif /* USE_ZSTD_ADVANCED_FEATURE */
+
 #endif	/* USE_ZSTD */

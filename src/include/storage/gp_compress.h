@@ -80,6 +80,20 @@ typedef struct
 extern void zstd_free_context(zstd_context *context);
 extern zstd_context *zstd_alloc_context(void);
 
+#ifdef USE_ZSTD_ADVANCED_FEATURE
+
+extern void *zstd_custom_palloc(void *opaque, size_t size);
+extern void zstd_custom_pfree(void *opaque, void *address);
+
+static ZSTD_customMem ZSTD_customMem_pg = {
+	zstd_custom_palloc,
+	zstd_custom_pfree,
+	NULL,
+};
+extern ZSTD_CCtx *ZSTD_createCCtx_gp(void);
+
+#endif /* USE_ZSTD_ADVANCED_FEATURE */
+
 #endif	/* USE_ZSTD */
 
 
