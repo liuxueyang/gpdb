@@ -203,7 +203,7 @@ zstd_custom_pfree(void *opaque, void *address)
 	pfree(address);
 }
 
-static ZSTD_customMem ZSTD_customMem_pg = {
+static ZSTD_customMem ZSTD_customMem_gp = {
 	.customAlloc = zstd_custom_palloc,
 	.customFree = zstd_custom_pfree,
 	.opaque = NULL,
@@ -213,7 +213,7 @@ static ZSTD_customMem ZSTD_customMem_pg = {
 extern ZSTD_DCtx *ZSTD_createDCtx_gp(void)
 {
 #ifdef USE_ZSTD_ADVANCED_FEATURE
-	return ZSTD_createDCtx_advanced(ZSTD_customMem_pg);
+	return ZSTD_createDCtx_advanced(ZSTD_customMem_gp);
 #else
 	return ZSTD_createDCtx();
 #endif /* USE_ZSTD_ADVANCED_FEATURE */
@@ -222,9 +222,27 @@ extern ZSTD_DCtx *ZSTD_createDCtx_gp(void)
 extern ZSTD_CCtx *ZSTD_createCCtx_gp(void)
 {
 #ifdef USE_ZSTD_ADVANCED_FEATURE
-	return ZSTD_createCCtx_advanced(ZSTD_customMem_pg);
+	return ZSTD_createCCtx_advanced(ZSTD_customMem_gp);
 #else
 	return ZSTD_createCCtx();
+#endif /* USE_ZSTD_ADVANCED_FEATURE */
+}
+
+extern ZSTD_CStream *ZSTD_createCStream_gp(void)
+{
+#ifdef USE_ZSTD_ADVANCED_FEATURE
+	return ZSTD_createCStream_advanced(ZSTD_customMem_gp);
+#else
+	return ZSTD_createCStream();
+#endif /* USE_ZSTD_ADVANCED_FEATURE */
+}
+
+extern ZSTD_DStream *ZSTD_createDStream_gp(void)
+{
+#ifdef USE_ZSTD_ADVANCED_FEATURE
+	return ZSTD_createDStream_advanced(ZSTD_customMem_gp);
+#else
+	return ZSTD_createDStream();
 #endif /* USE_ZSTD_ADVANCED_FEATURE */
 }
 

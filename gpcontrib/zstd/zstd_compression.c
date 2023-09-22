@@ -68,7 +68,7 @@ zstd_constructor(PG_FUNCTION_ARGS)
 
 	state->ctx = zstd_alloc_context();
 	state->ctx->cctx = ZSTD_createCCtx_gp();
-	state->ctx->dctx = ZSTD_createDCtx();
+	state->ctx->dctx = ZSTD_createDCtx_gp();
 
 	if (!state->ctx->cctx)
 		elog(ERROR, "out of memory");
