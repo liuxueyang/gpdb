@@ -139,6 +139,14 @@ typedef struct AppendOnlyBlockDirectory
 	ScanKey scanKeys;
 	StrategyNumber *strategyNumbers;
 
+	/*
+	 * GP_ABI_BUMP_FIXME
+	 *
+	 * Not used, just for ABI compatibility, remove this when we decide to bump
+	 * the ABI version.
+	 */
+	int cached_mpentry_num;
+
 }	AppendOnlyBlockDirectory;
 
 

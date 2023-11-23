@@ -97,7 +97,7 @@ typedef struct workfile_set
 	 * Not used, just for ABI compatibility, remove this when we decide to bump
 	 * the ABI version.
 	 */
-	uint64		abi_reserved;
+	uint64		min_file_size;
 
 	/* Total memory usage by compression buffer */
 	uint64		compression_buf_total;

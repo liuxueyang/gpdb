@@ -416,7 +416,7 @@ typedef struct HashJoinTableData
 	 * Not used, just for ABI compatibility, remove this when we decide to bump
 	 * the ABI version.
 	 */
-	uint64		workset_abi_reserved;
+	uint64		workset_min_file_size;
 	uint64		workset_compression_buf_total;
 }			HashJoinTableData;
 
